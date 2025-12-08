@@ -1,0 +1,24 @@
+{% extends 'garten/base.html' %}
+
+{% block content %}
+<h1>Willkommen im Garten Manager</h1>
+
+<div class="card">
+    <h2>Übersicht</h2>
+    <p>Verwalten Sie Ihre Sorten und Pflanzpläne einfach und mobil.</p>
+    <ul>
+        <li><strong>{{ sorten_count }}</strong> Sorten erfasst</li>
+        <li><strong>{{ pflanzplan_count }}</strong> Einträge im Pflanzplan</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h2>Schnellzugriff</h2>
+    <nav>
+        <ul>
+            <li><a href="{% url 'sorte_list' %}" style="color: var(--primary-color);">Alle Sorten anzeigen</a></li>
+            <li><a href="{% url 'pflanzplan_list' %}" style="color: var(--primary-color);">Pflanzplan ansehen</a></li>
+        </ul>
+    </nav>
+</div>
+{% endblock %}

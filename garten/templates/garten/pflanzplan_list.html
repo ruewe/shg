@@ -1,0 +1,66 @@
+{% extends 'garten/base.html' %}
+
+{% block content %}
+<h1>Pflanzplan</h1>
+
+<div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <a href="{% url 'pflanzplan_create' %}" style="background-color: var(--primary-color); color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px; font-weight: bold;">+ Neuer Eintrag</a>
+
+    <form method="get" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+        <select name="jahr" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="">Alle Jahre</option>
+            {% for j in jahre %}
+            <option value="{{ j }}" {% if selected_jahr == j %}selected{% endif %}>{{ j }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="kategorie" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="">Alle Kategorien</option>
+            {% for k in kategorien %}
+            <option value="{{ k.id }}" {% if selected_kategorie == k.id %}selected{% endif %}>{{ k.name }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="sorte" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="">Alle Sorten</option>
+            {% for s in sorten %}
+            <option value="{{ s.id }}" {% if selected_sorte == s.id %}selected{% endif %}>{{ s.name }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" style="background-color: var(--secondary-color); color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer;">Filtern</button>
+        <a href="{% url 'pflanzplan_list' %}" style="color: #666; text-decoration: none; padding: 0.5rem;">Reset</a>
+    </form>
+</div>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Jahr</th>
+                <th>Sorte</th>
+                <th>Kategorie</th>
+                <th>Aussaat</th>
+                <th>Art</th>
+                <th>Anzahl</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for eintrag in pflanzplaene %}
+            <tr>
+                <td data-label="Jahr">{{ eintrag.jahr }}</td>
+                <td data-label="Sorte">{{ eintrag.sorte.name }}</td>
+                <td data-label="Kategorie">{{ eintrag.sorte.kategorie.name }}</td>
+                <td data-label="Aussaat">{{ eintrag.aussaatdatum|date:"d.m.Y" }}</td>
+                <td data-label="Art">{{ eintrag.get_art_der_aussaat_display }}</td>
+                <td data-label="Anzahl">{{ eintrag.anzahl_samen }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">Keine Einträge gefunden.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'garten/base.html' %}
+
+{% block content %}
+<h1>Sorten</h1>
+
+<div style="margin-bottom: 1rem;">
+    <a href="{% url 'sorte_create' %}"
+        style="background-color: var(--primary-color); color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px; font-weight: bold;">+
+        Neue Sorte</a>
+</div>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Kategorie</th>
+                <th>Art</th>
+                <th>Bestand</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sorte in sorten %}
+            <tr>
+                <td data-label="Name">{{ sorte.name }}</td>
+                <td data-label="Kategorie">{{ sorte.kategorie.name }}</td>
+                <td data-label="Art">{{ sorte.art.name|default:"-" }}</td>
+                <td data-label="Bestand">{{ sorte.bestand }} {{ sorte.get_einheit_display }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">Keine Sorten gefunden.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
