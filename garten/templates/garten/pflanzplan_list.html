@@ -3,8 +3,11 @@
 {% block content %}
 <h1>Pflanzplan</h1>
 
-<div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-    <a href="{% url 'pflanzplan_create' %}" style="background-color: var(--primary-color); color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px; font-weight: bold;">+ Neuer Eintrag</a>
+<div
+    style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <a href="{% url 'pflanzplan_create' %}"
+        style="background-color: var(--primary-color); color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px; font-weight: bold;">+
+        Neuer Eintrag</a>
 
     <form method="get" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
         <select name="jahr" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
@@ -28,7 +31,8 @@
             {% endfor %}
         </select>
 
-        <button type="submit" style="background-color: var(--secondary-color); color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer;">Filtern</button>
+        <button type="submit"
+            style="background-color: var(--secondary-color); color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer;">Filtern</button>
         <a href="{% url 'pflanzplan_list' %}" style="color: #666; text-decoration: none; padding: 0.5rem;">Reset</a>
     </form>
 </div>
@@ -43,6 +47,7 @@
                 <th>Aussaat</th>
                 <th>Art</th>
                 <th>Anzahl</th>
+                <th>Aktionen</th>
             </tr>
         </thead>
         <tbody>
@@ -54,10 +59,13 @@
                 <td data-label="Aussaat">{{ eintrag.aussaatdatum|date:"d.m.Y" }}</td>
                 <td data-label="Art">{{ eintrag.get_art_der_aussaat_display }}</td>
                 <td data-label="Anzahl">{{ eintrag.anzahl_samen }}</td>
+                <td data-label="Aktionen">
+                    <a href="{% url 'pflanzplan_delete' eintrag.pk %}" style="color: #dc3545;">Löschen</a>
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6">Keine Einträge gefunden.</td>
+                <td colspan="7">Keine Einträge gefunden.</td>
             </tr>
             {% endfor %}
         </tbody>

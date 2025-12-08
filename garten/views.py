@@ -190,3 +190,10 @@ def sorte_delete(request, pk):
         sorte.delete()
         return redirect('sorte_list')
     return render(request, 'garten/confirm_delete.html', {'object': sorte, 'type': 'Sorte'})
+
+def pflanzplan_delete(request, pk):
+    eintrag = get_object_or_404(PflanzplanEintrag, pk=pk)
+    if request.method == 'POST':
+        eintrag.delete()
+        return redirect('pflanzplan_list')
+    return render(request, 'garten/confirm_delete.html', {'object': eintrag, 'type': 'Pflanzplan-Eintrag'})

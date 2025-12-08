@@ -6,7 +6,8 @@ from .views import (
     kategorie_create, art_create,
     kategorie_list, kategorie_update, kategorie_delete,
     art_list, art_update, art_delete,
-    sorte_update, sorte_delete
+    sorte_update, sorte_delete,
+    pflanzplan_delete
 )
 
 router = DefaultRouter()
@@ -35,6 +36,7 @@ urlpatterns = [
     
     path('pflanzplan/', pflanzplan_list, name='pflanzplan_list'),
     path('pflanzplan/neu/', pflanzplan_create, name='pflanzplan_create'),
+    path('pflanzplan/<int:pk>/loeschen/', pflanzplan_delete, name='pflanzplan_delete'),
     
     path('api/', include(router.urls)),
 ]

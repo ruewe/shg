@@ -274,3 +274,15 @@ class ManagementTests(TestCase):
         response = self.client.post(reverse('sorte_delete', args=[self.sorte.id]))
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Sorte.objects.filter(id=self.sorte.id).exists())
+
+    def test_pflanzplan_delete(self):
+        eintrag = PflanzplanEintrag.objects.create(
+            sorte=self.sorte,
+            jahr=2025,
+            aussaatdatum='2025-03-15',
+            anzahl_samen=5,
+            art_der_aussaat='ANZUCHT'
+        )
+        response = self.client.post(reverse('pflanzplan_delete', args=[eintrag.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(PflanzplanEintrag.objects.filter(id=eintrag.id).exists())
