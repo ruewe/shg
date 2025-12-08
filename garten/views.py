@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets
 from .models import Sorte, Kategorie, Art, PflanzplanEintrag
 from .serializers import SorteSerializer, KategorieSerializer, ArtSerializer, PflanzplanEintragSerializer
-from .forms import SorteForm, PflanzplanForm
+from .forms import SorteForm, PflanzplanForm, KategorieForm, ArtForm
 
 def index(request):
     context = {
@@ -17,13 +17,20 @@ def sorte_list(request):
     kategorie_id = request.GET.get('kategorie')
     if kategorie_id:
         queryset = queryset.filter(kategorie_id=kategorie_id)
+
+    art_id = request.GET.get('art')
+    if art_id:
+        queryset = queryset.filter(art_id=art_id)
         
     kategorien = Kategorie.objects.all()
+    arten = Art.objects.all()
     
     context = {
         'sorten': queryset,
         'kategorien': kategorien,
+        'arten': arten,
         'selected_kategorie': int(kategorie_id) if kategorie_id else None,
+        'selected_art': int(art_id) if art_id else None,
     }
     return render(request, 'garten/sorte_list.html', context)
 
@@ -86,6 +93,26 @@ def pflanzplan_create(request):
         form = PflanzplanForm()
     return render(request, 'garten/pflanzplan_form.html', {'form': form})
 
+def kategorie_create(request):
+    if request.method == 'POST':
+        form = KategorieForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+    else:
+        form = KategorieForm()
+    return render(request, 'garten/kategorie_form.html', {'form': form})
+
+def art_create(request):
+    if request.method == 'POST':
+        form = ArtForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+    else:
+        form = ArtForm()
+    return render(request, 'garten/art_form.html', {'form': form})
+
 class KategorieViewSet(viewsets.ModelViewSet):
     queryset = Kategorie.objects.all()
     serializer_class = KategorieSerializer
@@ -101,3 +128,65 @@ class SorteViewSet(viewsets.ModelViewSet):
 class PflanzplanEintragViewSet(viewsets.ModelViewSet):
     queryset = PflanzplanEintrag.objects.all()
     serializer_class = PflanzplanEintragSerializer
+
+def kategorie_list(request):
+    kategorien = Kategorie.objects.all()
+    return render(request, 'garten/kategorie_list.html', {'kategorien': kategorien})
+
+def kategorie_update(request, pk):
+    kategorie = get_object_or_404(Kategorie, pk=pk)
+    if request.method == 'POST':
+        form = KategorieForm(request.POST, instance=kategorie)
+        if form.is_valid():
+            form.save()
+            return redirect('kategorie_list')
+    else:
+        form = KategorieForm(instance=kategorie)
+    return render(request, 'garten/kategorie_form.html', {'form': form})
+
+def kategorie_delete(request, pk):
+    kategorie = get_object_or_404(Kategorie, pk=pk)
+    if request.method == 'POST':
+        kategorie.delete()
+        return redirect('kategorie_list')
+    return render(request, 'garten/confirm_delete.html', {'object': kategorie, 'type': 'Kategorie'})
+
+def art_list(request):
+    arten = Art.objects.all()
+    return render(request, 'garten/art_list.html', {'arten': arten})
+
+def art_update(request, pk):
+    art = get_object_or_404(Art, pk=pk)
+    if request.method == 'POST':
+        form = ArtForm(request.POST, instance=art)
+        if form.is_valid():
+            form.save()
+            return redirect('art_list')
+    else:
+        form = ArtForm(instance=art)
+    return render(request, 'garten/art_form.html', {'form': form})
+
+def art_delete(request, pk):
+    art = get_object_or_404(Art, pk=pk)
+    if request.method == 'POST':
+        art.delete()
+        return redirect('art_list')
+    return render(request, 'garten/confirm_delete.html', {'object': art, 'type': 'Art'})
+
+def sorte_update(request, pk):
+    sorte = get_object_or_404(Sorte, pk=pk)
+    if request.method == 'POST':
+        form = SorteForm(request.POST, instance=sorte)
+        if form.is_valid():
+            form.save()
+            return redirect('sorte_list')
+    else:
+        form = SorteForm(instance=sorte)
+    return render(request, 'garten/sorte_form.html', {'form': form})
+
+def sorte_delete(request, pk):
+    sorte = get_object_or_404(Sorte, pk=pk)
+    if request.method == 'POST':
+        sorte.delete()
+        return redirect('sorte_list')
+    return render(request, 'garten/confirm_delete.html', {'object': sorte, 'type': 'Sorte'})

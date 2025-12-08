@@ -1,0 +1,21 @@
+{% extends 'garten/base.html' %}
+
+{% block content %}
+<h1>Neue Art</h1>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+            <div class="error">{{ form.name.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Speichern</button>
+        <a href="{% url 'index' %}" class="btn btn-secondary">Abbrechen</a>
+    </form>
+</div>
+{% endblock %}

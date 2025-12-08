@@ -1,4 +1,5 @@
 from django.test import TestCase, Client
+from django.urls import reverse
 from .models import Sorte, Kategorie, Art, PflanzplanEintrag
 from datetime import date
 
@@ -91,14 +92,12 @@ class DataEntryTests(TestCase):
             'bestand': 5,
             'einheit': 'ANZ'
         }
-        response = client.post('/sorten/neu/', data)
+        response = self.client.post('/sorten/neu/', data)
         self.assertEqual(response.status_code, 302) # Redirect after success
         self.assertTrue(Sorte.objects.filter(name='Neue Sorte').exists())
 
     def test_pflanzplan_create_view(self):
         """Test creating a new PflanzplanEintrag via the view"""
-        from django.test import Client
-        client = Client()
         
         data = {
             'sorte': self.sorte.id,
@@ -108,16 +107,41 @@ class DataEntryTests(TestCase):
             'art_der_aussaat': 'ANZUCHT',
             'anzuchtgefaess': 'Topf'
         }
-        response = client.post('/pflanzplan/neu/', data)
+        response = self.client.post('/pflanzplan/neu/', data)
         self.assertEqual(response.status_code, 302) # Redirect after success
         self.assertTrue(PflanzplanEintrag.objects.filter(jahr=2026).exists())
 
+    def test_pflanzplan_create_post(self):
+        sorte = Sorte.objects.create(name="TestSorte", kategorie=self.kategorie, art=self.art)
+        response = self.client.post(reverse('pflanzplan_create'), {
+            'sorte': sorte.id,
+            'jahr': 2025,
+            'aussaatdatum': '2025-03-15',
+            'anzahl_samen': 10,
+            'art_der_aussaat': 'ANZUCHT',
+            'anzuchtgefaess': 'Topf'
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(PflanzplanEintrag.objects.count(), 1)
+
+    def test_kategorie_create_post(self):
+        response = self.client.post(reverse('kategorie_create'), {
+            'name': 'Neue Kategorie'
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Kategorie.objects.filter(name='Neue Kategorie').exists())
+
+    def test_art_create_post(self):
+        response = self.client.post(reverse('art_create'), {
+            'name': 'Neue Art'
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Art.objects.filter(name='Neue Art').exists())
+
     def test_form_rendering(self):
         """Test that form labels are rendered correctly (not as {{ field.label }})"""
-        from django.test import Client
-        client = Client()
         
-        response = client.get('/sorten/neu/')
+        response = self.client.get('/sorten/neu/')
         self.assertEqual(response.status_code, 200)
         # Check that the literal template tag is NOT present (this was the bug)
         self.assertNotContains(response, '{{ field.label }}')
@@ -178,3 +202,75 @@ class SorteFilterTests(TestCase):
         response = client.get(f'/sorten/?kategorie={self.kategorie_obst.id}')
         self.assertEqual(len(response.context['sorten']), 1)
         self.assertEqual(response.context['sorten'][0].name, 'Boskoop')
+
+    def test_filter_sorte_by_art(self):
+        client = Client()
+        response = client.get(f'/sorten/?art={self.art_tomate.id}')
+        self.assertEqual(len(response.context['sorten']), 1)
+        self.assertEqual(response.context['sorten'][0].name, 'Harzfeuer')
+
+        response = client.get(f'/sorten/?art={self.art_apfel.id}')
+        self.assertEqual(len(response.context['sorten']), 1)
+        self.assertEqual(response.context['sorten'][0].name, 'Boskoop')
+
+class ManagementTests(TestCase):
+    def setUp(self):
+        self.kategorie = Kategorie.objects.create(name="Gemüse")
+        self.art = Art.objects.create(name="Tomate")
+        self.sorte = Sorte.objects.create(name="Harzfeuer", kategorie=self.kategorie, art=self.art)
+
+    def test_kategorie_list(self):
+        response = self.client.get(reverse('kategorie_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Gemüse")
+
+    def test_kategorie_update(self):
+        response = self.client.post(reverse('kategorie_update', args=[self.kategorie.id]), {
+            'name': 'Gemüse Updated'
+        })
+        self.assertEqual(response.status_code, 302)
+        self.kategorie.refresh_from_db()
+        self.assertEqual(self.kategorie.name, 'Gemüse Updated')
+
+    def test_kategorie_delete(self):
+        kategorie_to_delete = Kategorie.objects.create(name="To Delete")
+        response = self.client.post(reverse('kategorie_delete', args=[kategorie_to_delete.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Kategorie.objects.filter(id=kategorie_to_delete.id).exists())
+
+    def test_art_list(self):
+        response = self.client.get(reverse('art_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Tomate")
+
+    def test_art_update(self):
+        response = self.client.post(reverse('art_update', args=[self.art.id]), {
+            'name': 'Tomate Updated'
+        })
+        self.assertEqual(response.status_code, 302)
+        self.art.refresh_from_db()
+        self.assertEqual(self.art.name, 'Tomate Updated')
+
+    def test_art_delete(self):
+        art_to_delete = Art.objects.create(name="To Delete")
+        response = self.client.post(reverse('art_delete', args=[art_to_delete.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Art.objects.filter(id=art_to_delete.id).exists())
+
+    def test_sorte_update(self):
+        response = self.client.post(reverse('sorte_update', args=[self.sorte.id]), {
+            'name': 'Harzfeuer Updated',
+            'kategorie': self.kategorie.id,
+            'art': self.art.id,
+            'bestand': 20,
+            'einheit': 'ANZ'
+        })
+        self.assertEqual(response.status_code, 302)
+        self.sorte.refresh_from_db()
+        self.assertEqual(self.sorte.name, 'Harzfeuer Updated')
+        self.assertEqual(self.sorte.bestand, 20)
+
+    def test_sorte_delete(self):
+        response = self.client.post(reverse('sorte_delete', args=[self.sorte.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Sorte.objects.filter(id=self.sorte.id).exists())

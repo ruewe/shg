@@ -1,5 +1,21 @@
 from django import forms
-from .models import Sorte, PflanzplanEintrag
+from .models import Sorte, PflanzplanEintrag, Kategorie, Art
+
+class KategorieForm(forms.ModelForm):
+    class Meta:
+        model = Kategorie
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class ArtForm(forms.ModelForm):
+    class Meta:
+        model = Art
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+        }
 
 class SorteForm(forms.ModelForm):
     class Meta:
