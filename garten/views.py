@@ -12,8 +12,20 @@ def index(request):
     return render(request, 'garten/index.html', context)
 
 def sorte_list(request):
-    sorten = Sorte.objects.all().select_related('kategorie', 'art')
-    return render(request, 'garten/sorte_list.html', {'sorten': sorten})
+    queryset = Sorte.objects.all().select_related('kategorie', 'art')
+    
+    kategorie_id = request.GET.get('kategorie')
+    if kategorie_id:
+        queryset = queryset.filter(kategorie_id=kategorie_id)
+        
+    kategorien = Kategorie.objects.all()
+    
+    context = {
+        'sorten': queryset,
+        'kategorien': kategorien,
+        'selected_kategorie': int(kategorie_id) if kategorie_id else None,
+    }
+    return render(request, 'garten/sorte_list.html', context)
 
 def sorte_create(request):
     if request.method == 'POST':

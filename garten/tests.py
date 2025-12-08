@@ -157,3 +157,24 @@ class FilterTests(TestCase):
         response = client.get(f'/pflanzplan/?sorte={self.sorte_harzfeuer.id}')
         self.assertEqual(len(response.context['pflanzplaene']), 1)
         self.assertEqual(response.context['pflanzplaene'][0].sorte.name, 'Harzfeuer')
+
+class SorteFilterTests(TestCase):
+    def setUp(self):
+        self.kategorie_gemuese = Kategorie.objects.create(name="Gemüse")
+        self.kategorie_obst = Kategorie.objects.create(name="Obst")
+        
+        self.art_tomate = Art.objects.create(name="Tomate")
+        self.art_apfel = Art.objects.create(name="Apfel")
+        
+        self.sorte_harzfeuer = Sorte.objects.create(name="Harzfeuer", kategorie=self.kategorie_gemuese, art=self.art_tomate)
+        self.sorte_boskoop = Sorte.objects.create(name="Boskoop", kategorie=self.kategorie_obst, art=self.art_apfel)
+
+    def test_filter_sorte_by_kategorie(self):
+        client = Client()
+        response = client.get(f'/sorten/?kategorie={self.kategorie_gemuese.id}')
+        self.assertEqual(len(response.context['sorten']), 1)
+        self.assertEqual(response.context['sorten'][0].name, 'Harzfeuer')
+
+        response = client.get(f'/sorten/?kategorie={self.kategorie_obst.id}')
+        self.assertEqual(len(response.context['sorten']), 1)
+        self.assertEqual(response.context['sorten'][0].name, 'Boskoop')
