@@ -286,3 +286,9 @@ class ManagementTests(TestCase):
         response = self.client.post(reverse('pflanzplan_delete', args=[eintrag.id]))
         self.assertEqual(response.status_code, 302)
         self.assertFalse(PflanzplanEintrag.objects.filter(id=eintrag.id).exists())
+
+    def test_navigation_links(self):
+        """Test that navigation links are present in the response"""
+        response = self.client.get('/')
+        self.assertContains(response, 'href="/kategorien/"')
+        self.assertContains(response, 'href="/arten/"')
