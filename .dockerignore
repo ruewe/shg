@@ -26,3 +26,6 @@ db.sqlite3
 # Static / Media
 staticfiles/
 media/
+
+# Nginx Proxy Manager Data
+npm/
