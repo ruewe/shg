@@ -15,9 +15,16 @@ RUN pip install --no-cache-dir -r requirements.txt whitenoise gunicorn
 # Projektcode kopieren
 COPY . .
 
-# Environment Variable für Production (kann im Compose überschrieben werden)
+# Entrypoint kopieren und ausführbar machen
+COPY entrypoint.sh .
+RUN sed -i 's/\r$//g' /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Environment Variable für Production
 ENV DJANGO_SETTINGS_MODULE=shg.settings
 
+# Entrypoint setzen
+ENTRYPOINT ["/app/entrypoint.sh"]
+
 # Startbefehl
-# Führt Migrationen aus, sammelt Statics und startet Gunicorn
 CMD ["sh", "-c", "python manage.py collectstatic --noinput && python manage.py migrate && gunicorn shg.wsgi:application --bind 0.0.0.0:8000"]
