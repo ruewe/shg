@@ -20,13 +20,14 @@ class ArtForm(forms.ModelForm):
 class SorteForm(forms.ModelForm):
     class Meta:
         model = Sorte
-        fields = ['name', 'kategorie', 'art', 'bestand', 'einheit', 'aussaat_start_monat', 'aussaat_end_monat']
+        fields = ['name', 'kategorie', 'art', 'bestand', 'einheit', 'info_url', 'aussaat_start_monat', 'aussaat_end_monat']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'kategorie': forms.Select(attrs={'class': 'form-control'}),
             'art': forms.Select(attrs={'class': 'form-control'}),
             'bestand': forms.NumberInput(attrs={'class': 'form-control'}),
             'einheit': forms.Select(attrs={'class': 'form-control'}),
+            'info_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://...'}),
             'aussaat_start_monat': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 12}),
             'aussaat_end_monat': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 12}),
         }
