@@ -3,6 +3,8 @@ from rest_framework import viewsets
 from .models import Sorte, Kategorie, Art, PflanzplanEintrag
 from .serializers import SorteSerializer, KategorieSerializer, ArtSerializer, PflanzplanEintragSerializer
 from .forms import SorteForm, PflanzplanForm, KategorieForm, ArtForm
+import sys
+import traceback
 
 def index(request):
     context = {
@@ -12,27 +14,32 @@ def index(request):
     return render(request, 'garten/index.html', context)
 
 def sorte_list(request):
-    queryset = Sorte.objects.all().select_related('kategorie', 'art')
-    
-    kategorie_id = request.GET.get('kategorie')
-    if kategorie_id:
-        queryset = queryset.filter(kategorie_id=kategorie_id)
-
-    art_id = request.GET.get('art')
-    if art_id:
-        queryset = queryset.filter(art_id=art_id)
+    try:
+        queryset = Sorte.objects.all().select_related('kategorie', 'art')
         
-    kategorien = Kategorie.objects.all()
-    arten = Art.objects.all()
-    
-    context = {
-        'sorten': queryset,
-        'kategorien': kategorien,
-        'arten': arten,
-        'selected_kategorie': int(kategorie_id) if kategorie_id else None,
-        'selected_art': int(art_id) if art_id else None,
-    }
-    return render(request, 'garten/sorte_list.html', context)
+        kategorie_id = request.GET.get('kategorie')
+        if kategorie_id:
+            queryset = queryset.filter(kategorie_id=kategorie_id)
+
+        art_id = request.GET.get('art')
+        if art_id:
+            queryset = queryset.filter(art_id=art_id)
+            
+        kategorien = Kategorie.objects.all()
+        arten = Art.objects.all()
+        
+        context = {
+            'sorten': queryset,
+            'kategorien': kategorien,
+            'arten': arten,
+            'selected_kategorie': int(kategorie_id) if kategorie_id else None,
+            'selected_art': int(art_id) if art_id else None,
+        }
+        return render(request, 'garten/sorte_list.html', context)
+    except Exception:
+        print("!!! CRITICAL ERROR IN SORTE_LIST !!!", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
+        raise
 
 def sorte_create(request):
     if request.method == 'POST':
