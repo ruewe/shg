@@ -45,7 +45,7 @@
             {% for sorte in sorten %}
             <tr>
                 <td data-label="Name">{{ sorte.name }}</td>
-                <td data-label="Kategorie">{{ sorte.kategorie.name }}</td>
+                <td data-label="Kategorie">{{ sorte.kategorie.name|default:"-" }}</td>
                 <td data-label="Art">{{ sorte.art.name|default:"-" }}</td>
                 <td data-label="Bestand">{{ sorte.bestand }} {{ sorte.get_einheit_display }}</td>
                 <td data-label="Aktionen">
