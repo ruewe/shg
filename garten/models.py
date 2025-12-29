@@ -38,7 +38,7 @@ class Sorte(models.Model):
     art = models.ForeignKey(Art, on_delete=models.PROTECT, null=True, blank=True, related_name='sorten')
     aussaat_start_monat = models.PositiveSmallIntegerField(null=True, blank=True, help_text='Monat (1–12)')
     aussaat_end_monat = models.PositiveSmallIntegerField(null=True, blank=True, help_text='Monat (1–12)')
-    info_url = models.URLField(blank=True)
+
     bestand = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     einheit = models.CharField(max_length=10, choices=EINHEITEN, default='ANZ')
 

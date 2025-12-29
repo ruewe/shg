@@ -19,7 +19,7 @@ class ArtAdmin(admin.ModelAdmin):
 
 @admin.register(Sorte)
 class SorteAdmin(admin.ModelAdmin):
-    list_display = ('name', 'kategorie', 'art', 'bestand', 'einheit', 'info_url')
+    list_display = ('name', 'kategorie', 'art', 'bestand', 'einheit')
     search_fields = ('name', 'kategorie__name', 'art__name')
     actions = ['duplicate_sorte']
 
