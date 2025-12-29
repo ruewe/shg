@@ -37,6 +37,7 @@
                 <th>Name</th>
                 <th>Kategorie</th>
                 <th>Art</th>
+                <th>Info</th>
                 <th>Bestand</th>
                 <th>Aktionen</th>
             </tr>
@@ -47,6 +48,13 @@
                 <td data-label="Name">{{ sorte.name }}</td>
                 <td data-label="Kategorie">{{ sorte.kategorie.name|default:"-" }}</td>
                 <td data-label="Art">{{ sorte.art.name|default:"-" }}</td>
+                <td data-label="Info">
+                    {% if sorte.info_url %}
+                    <a href="{{ sorte.info_url }}" target="_blank" style="color: var(--primary-color);">Link</a>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
                 <td data-label="Bestand">{{ sorte.bestand }} {{ sorte.get_einheit_display }}</td>
                 <td data-label="Aktionen">
                     <a href="{% url 'sorte_update' sorte.pk %}"
