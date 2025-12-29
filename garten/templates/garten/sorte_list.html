@@ -13,14 +13,14 @@
         <select name="kategorie" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
             <option value="">Alle Kategorien</option>
             {% for k in kategorien %}
-            <option value="{{ k.id }}" {% if selected_kategorie==k.id %}selected{% endif %}>{{ k.name }}</option>
+            <option value="{{ k.id }}" {% if selected_kategorie == k.id %}selected{% endif %}>{{ k.name }}</option>
             {% endfor %}
         </select>
 
         <select name="art" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
             <option value="">Alle Arten</option>
             {% for a in arten %}
-            <option value="{{ a.id }}" {% if selected_art==a.id %}selected{% endif %}>{{ a.name }}</option>
+            <option value="{{ a.id }}" {% if selected_art == a.id %}selected{% endif %}>{{ a.name }}</option>
             {% endfor %}
         </select>
 
