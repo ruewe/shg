@@ -34,7 +34,7 @@ class Sorte(models.Model):
     ]
 
     name = models.CharField(max_length=200)
-    kategorie = models.ForeignKey(Kategorie, on_delete=models.PROTECT, related_name='sorten')
+    kategorie = models.ForeignKey(Kategorie, on_delete=models.PROTECT, related_name='sorten', null=True, blank=True)
     art = models.ForeignKey(Art, on_delete=models.PROTECT, null=True, blank=True, related_name='sorten')
     aussaat_start_monat = models.PositiveSmallIntegerField(null=True, blank=True, help_text='Monat (1–12)')
     aussaat_end_monat = models.PositiveSmallIntegerField(null=True, blank=True, help_text='Monat (1–12)')
