@@ -18,6 +18,17 @@
                 <li><a href="{% url 'pflanzplan_list' %}">Pflanzplan</a></li>
                 <li><a href="{% url 'kategorie_list' %}">Kategorien</a></li>
                 <li><a href="{% url 'art_list' %}">Arten</a></li>
+                {% if user.is_authenticated %}
+                <li style="margin-left: auto; display: flex; align-items: center; gap: 1rem;">
+                    <span style="font-size: 0.85rem; color: #666;">Hallo, {{ user.username }}</span>
+                    <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" style="background: none; border: none; color: #dc3545; cursor: pointer; font-size: 0.9rem; padding: 0.5rem; text-decoration: none;">Abmelden</button>
+                    </form>
+                </li>
+                {% else %}
+                <li style="margin-left: auto;"><a href="{% url 'login' %}">Anmelden</a></li>
+                {% endif %}
             </ul>
         </nav>
     </header>

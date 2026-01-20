@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import viewsets
 from .models import Sorte, Kategorie, Art, PflanzplanEintrag
 from .serializers import SorteSerializer, KategorieSerializer, ArtSerializer, PflanzplanEintragSerializer
 from .forms import SorteForm, PflanzplanForm, KategorieForm, ArtForm
 
+@login_required
 def index(request):
     context = {
         'sorten_count': Sorte.objects.count(),
@@ -11,6 +14,7 @@ def index(request):
     }
     return render(request, 'garten/index.html', context)
 
+@login_required
 def sorte_list(request):
     queryset = Sorte.objects.all().select_related('kategorie', 'art')
     
@@ -34,6 +38,7 @@ def sorte_list(request):
     }
     return render(request, 'garten/sorte_list.html', context)
 
+@login_required
 def sorte_create(request):
     if request.method == 'POST':
         form = SorteForm(request.POST)
@@ -44,6 +49,7 @@ def sorte_create(request):
         form = SorteForm()
     return render(request, 'garten/sorte_form.html', {'form': form})
 
+@login_required
 def pflanzplan_list(request):
     # Base QuerySet
     queryset = PflanzplanEintrag.objects.all().select_related('sorte', 'sorte__kategorie')
@@ -83,6 +89,7 @@ def pflanzplan_list(request):
     }
     return render(request, 'garten/pflanzplan_list.html', context)
 
+@login_required
 def pflanzplan_create(request):
     if request.method == 'POST':
         form = PflanzplanForm(request.POST)
@@ -93,6 +100,7 @@ def pflanzplan_create(request):
         form = PflanzplanForm()
     return render(request, 'garten/pflanzplan_form.html', {'form': form})
 
+@login_required
 def kategorie_create(request):
     if request.method == 'POST':
         form = KategorieForm(request.POST)
@@ -103,6 +111,7 @@ def kategorie_create(request):
         form = KategorieForm()
     return render(request, 'garten/kategorie_form.html', {'form': form})
 
+@login_required
 def art_create(request):
     if request.method == 'POST':
         form = ArtForm(request.POST)
@@ -113,26 +122,28 @@ def art_create(request):
         form = ArtForm()
     return render(request, 'garten/art_form.html', {'form': form})
 
-class KategorieViewSet(viewsets.ModelViewSet):
+class KategorieViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
     queryset = Kategorie.objects.all()
     serializer_class = KategorieSerializer
 
-class ArtViewSet(viewsets.ModelViewSet):
+class ArtViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
     queryset = Art.objects.all()
     serializer_class = ArtSerializer
 
-class SorteViewSet(viewsets.ModelViewSet):
+class SorteViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
     queryset = Sorte.objects.all()
     serializer_class = SorteSerializer
 
-class PflanzplanEintragViewSet(viewsets.ModelViewSet):
+class PflanzplanEintragViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
     queryset = PflanzplanEintrag.objects.all()
     serializer_class = PflanzplanEintragSerializer
 
+@login_required
 def kategorie_list(request):
     kategorien = Kategorie.objects.all()
     return render(request, 'garten/kategorie_list.html', {'kategorien': kategorien})
 
+@login_required
 def kategorie_update(request, pk):
     kategorie = get_object_or_404(Kategorie, pk=pk)
     if request.method == 'POST':
@@ -144,6 +155,7 @@ def kategorie_update(request, pk):
         form = KategorieForm(instance=kategorie)
     return render(request, 'garten/kategorie_form.html', {'form': form})
 
+@login_required
 def kategorie_delete(request, pk):
     kategorie = get_object_or_404(Kategorie, pk=pk)
     if request.method == 'POST':
@@ -151,10 +163,12 @@ def kategorie_delete(request, pk):
         return redirect('kategorie_list')
     return render(request, 'garten/confirm_delete.html', {'object': kategorie, 'type': 'Kategorie'})
 
+@login_required
 def art_list(request):
     arten = Art.objects.all()
     return render(request, 'garten/art_list.html', {'arten': arten})
 
+@login_required
 def art_update(request, pk):
     art = get_object_or_404(Art, pk=pk)
     if request.method == 'POST':
@@ -166,6 +180,7 @@ def art_update(request, pk):
         form = ArtForm(instance=art)
     return render(request, 'garten/art_form.html', {'form': form})
 
+@login_required
 def art_delete(request, pk):
     art = get_object_or_404(Art, pk=pk)
     if request.method == 'POST':
@@ -173,6 +188,7 @@ def art_delete(request, pk):
         return redirect('art_list')
     return render(request, 'garten/confirm_delete.html', {'object': art, 'type': 'Art'})
 
+@login_required
 def sorte_update(request, pk):
     sorte = get_object_or_404(Sorte, pk=pk)
     if request.method == 'POST':
@@ -184,6 +200,7 @@ def sorte_update(request, pk):
         form = SorteForm(instance=sorte)
     return render(request, 'garten/sorte_form.html', {'form': form})
 
+@login_required
 def sorte_delete(request, pk):
     sorte = get_object_or_404(Sorte, pk=pk)
     if request.method == 'POST':
@@ -191,6 +208,7 @@ def sorte_delete(request, pk):
         return redirect('sorte_list')
     return render(request, 'garten/confirm_delete.html', {'object': sorte, 'type': 'Sorte'})
 
+@login_required
 def pflanzplan_delete(request, pk):
     eintrag = get_object_or_404(PflanzplanEintrag, pk=pk)
     if request.method == 'POST':

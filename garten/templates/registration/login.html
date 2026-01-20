@@ -1,0 +1,38 @@
+{% extends 'garten/base.html' %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 4rem auto; padding: 2rem; background: var(--card-background); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); border: 1px solid var(--border-color);">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="margin-bottom: 0.5rem; color: var(--primary-color);">Garten Login</h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Bitte melde dich an, um fortzufahren.</p>
+    </div>
+
+    {% if form.errors %}
+    <div style="background-color: #fef2f2; border: 1px solid #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.9rem;">
+        Deine Anmeldedaten waren nicht korrekt. Bitte versuche es erneut.
+    </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <div style="margin-bottom: 1.5rem;">
+            <label for="id_username" style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-color);">Benutzername</label>
+            <input type="text" name="username" autofocus maxlength="150" required id="id_username" 
+                   style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; transition: border-color 0.2s; background: var(--background-color); color: var(--text-color);">
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label for="id_password" style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-color);">Passwort</label>
+            <input type="password" name="password" required id="id_password"
+                   style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; transition: border-color 0.2s; background: var(--background-color); color: var(--text-color);">
+        </div>
+
+        <button type="submit" 
+                style="width: 100%; background: var(--primary-color); color: white; padding: 0.75rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.1s, background-color 0.2s;">
+            Anmelden
+        </button>
+        
+        <input type="hidden" name="next" value="{{ next }}">
+    </form>
+</div>
+{% endblock %}
