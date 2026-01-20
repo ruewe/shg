@@ -26,4 +26,72 @@
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const select = document.getElementById('id_sorte');
+        if (!select) return;
+
+        // Create search input wrapper for better styling
+        const wrapper = document.createElement('div');
+        wrapper.style.marginBottom = '0.5rem';
+        
+        // Create search input
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.placeholder = 'Sorte suchen...';
+        searchInput.className = 'form-control'; 
+        searchInput.style.width = '100%';
+        searchInput.style.boxSizing = 'border-box'; // Ensure padding doesn't break width
+
+        wrapper.appendChild(searchInput);
+        
+        // Insert before select
+        select.parentNode.insertBefore(wrapper, select);
+
+        // Store original options
+        // We clone nodes to keep references safe when removing
+        const originalOptions = Array.from(select.options).map(opt => opt.cloneNode(true));
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const currentValue = select.value; // Try to keep selection if possible
+
+            // Clear current options
+            select.innerHTML = '';
+
+            let foundSelected = false;
+
+            // Filter and re-append
+            originalOptions.forEach(option => {
+                const text = option.text.toLowerCase();
+                const matches = text.includes(searchTerm);
+                // Always keep the placeholder "---------" or empty value if it exists and search is empty
+                const isPlaceholder = option.value === ''; 
+
+                if (matches || (isPlaceholder && searchTerm === '')) {
+                    select.add(option.cloneNode(true)); // Add clone to DOM
+                    if (option.value === currentValue) foundSelected = true;
+                }
+            });
+
+            // Restore selection if it still exists in the filtered list
+            if (foundSelected) {
+                select.value = currentValue;
+            } else if (select.options.length > 0) {
+                 // Convert '---------' or empty option to selected if nothing else matches
+                 if (select.options[0].value === '') {
+                     select.selectedIndex = 0;
+                 }
+            }
+            
+            // If no match, we could add a placeholder, but empty list is also clear.
+            if (select.options.length === 0) {
+                 const noResult = new Option('Keine Sorte gefunden', '');
+                 noResult.disabled = true;
+                 select.add(noResult);
+            }
+        });
+    });
+</script>
 {% endblock %}

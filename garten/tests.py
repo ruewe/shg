@@ -150,6 +150,13 @@ class DataEntryTests(TestCase):
         self.assertContains(response, 'Name')
         self.assertContains(response, '<label for="id_name"')
 
+    def test_searchable_select_js_present(self):
+        """Test that the JavaScript for searchable select is present in pflanzplan form"""
+        response = self.client.get('/pflanzplan/neu/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'document.getElementById(\'id_sorte\')')
+        self.assertContains(response, 'Sorte suchen...')
+
 class FilterTests(TestCase):
     def setUp(self):
         self.kategorie_gemuese = Kategorie.objects.create(name="Gemüse")
