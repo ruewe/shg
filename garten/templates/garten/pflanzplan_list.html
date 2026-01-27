@@ -47,6 +47,7 @@
                 <th>Aussaat</th>
                 <th>Art</th>
                 <th>Anzahl</th>
+                <th>Info</th>
                 <th>Aktionen</th>
             </tr>
         </thead>
@@ -59,13 +60,20 @@
                 <td data-label="Aussaat">{{ eintrag.aussaatdatum|date:"d.m.Y" }}</td>
                 <td data-label="Art">{{ eintrag.get_art_der_aussaat_display }}</td>
                 <td data-label="Anzahl">{{ eintrag.anzahl_samen }}</td>
+                <td data-label="Info">
+                    {% if eintrag.sorte.info_url %}
+                    <a href="{{ eintrag.sorte.info_url }}" target="_blank" style="color: var(--primary-color);">Link</a>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
                 <td data-label="Aktionen">
                     <a href="{% url 'pflanzplan_delete' eintrag.pk %}" style="color: #dc3545;">Löschen</a>
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7">Keine Einträge gefunden.</td>
+                <td colspan="8">Keine Einträge gefunden.</td>
             </tr>
             {% endfor %}
         </tbody>
