@@ -9,26 +9,82 @@
         <input style="display:none" type="text" name="fake_name_remembered">
         <input style="display:none" type="password" name="fake_password_remembered">
 
-        <div style="flex: 1; min-width: 250px;">
+        <div style="flex: 1; min-width: 250px; position: relative;">
             <label for="lookup_id" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Sorte suchen:</label>
             <input type="text" 
                    id="lookup_id" 
                    name="lookup_id" 
-                   list="sorten_list" 
                    value="{{ sorte_query }}" 
                    placeholder="Name eingeben..."
-                   autocomplete="chrome-off"
+                   autocomplete="off"
                    autocapitalize="none"
                    spellcheck="false"
-                   readonly 
-                   onfocus="this.removeAttribute('readonly');"
                    style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
-            <datalist id="sorten_list">
+            
+            <!-- Custom Dropdown -->
+            <div id="custom_suggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; border-top: none; border-radius: 0 0 4px 4px; z-index: 1000; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                 {% for s in alle_sorten %}
-                <option value="{{ s.name }}">
+                <div class="suggestion-item" 
+                     data-value="{{ s.name }}" 
+                     style="padding: 0.5rem; cursor: pointer; border-bottom: 1px solid #eee;">
+                    {{ s.name }}
+                </div>
                 {% endfor %}
-            </datalist>
+            </div>
         </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const input = document.getElementById('lookup_id');
+                const suggestionsBox = document.getElementById('custom_suggestions');
+                const items = document.querySelectorAll('.suggestion-item');
+
+                input.addEventListener('input', function() {
+                    const val = this.value.toLowerCase();
+                    let hasMatches = false;
+
+                    if (val.length > 0) {
+                        items.forEach(item => {
+                            const text = item.getAttribute('data-value').toLowerCase();
+                            if (text.includes(val)) {
+                                item.style.display = 'block';
+                                hasMatches = true;
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+                        suggestionsBox.style.display = hasMatches ? 'block' : 'none';
+                    } else {
+                        suggestionsBox.style.display = 'none';
+                    }
+                });
+
+                items.forEach(item => {
+                    item.addEventListener('click', function() {
+                        input.value = this.getAttribute('data-value');
+                        suggestionsBox.style.display = 'none';
+                        input.form.submit(); // Optional: Sofort abschicken bei Klick
+                    });
+                });
+
+                // Verstecken wenn man außerhalb klickt
+                document.addEventListener('click', function(e) {
+                    if (!input.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                        suggestionsBox.style.display = 'none';
+                    }
+                });
+
+                // Hover-Effekt
+                items.forEach(item => {
+                    item.addEventListener('mouseover', function() {
+                        this.style.backgroundColor = '#f0f0f0';
+                    });
+                    item.addEventListener('mouseout', function() {
+                        this.style.backgroundColor = 'white';
+                    });
+                });
+            });
+        </script>
 
         <div>
             <label for="jahr_select" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Jahr:</label>
