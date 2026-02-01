@@ -1,0 +1,101 @@
+{% extends 'garten/base.html' %}
+
+{% block content %}
+<h1>Sorten-Analyse</h1>
+
+<div class="card" style="margin-bottom: 2rem;">
+    <form method="get" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px;">
+            <label for="sorte_input" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Sorte suchen:</label>
+            <input type="text" 
+                   id="sorte_input" 
+                   name="sorte_name" 
+                   list="sorten_list" 
+                   value="{{ sorte_query }}" 
+                   placeholder="Name eingeben..."
+                   autocomplete="off"
+                   style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+            <datalist id="sorten_list">
+                {% for s in alle_sorten %}
+                <option value="{{ s.name }}">
+                {% endfor %}
+            </datalist>
+        </div>
+
+        <div>
+            <label for="jahr_select" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Jahr:</label>
+            <select name="jahr" id="jahr_select" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+                <option value="">Alle Jahre</option>
+                {% for j in jahre %}
+                <option value="{{ j }}" {% if selected_jahr == j %}selected{% endif %}>{{ j }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" style="background-color: var(--primary-color); color: white; padding: 0.5rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Anzeigen</button>
+        <a href="{% url 'sorte_analyse' %}" style="padding: 0.5rem; color: #666; text-decoration: none;">Leeren</a>
+    </form>
+</div>
+
+{% if selected_sorte %}
+    <div class="card" style="margin-bottom: 1.5rem; border-left: 5px solid var(--primary-color);">
+        <h2 style="margin-top: 0;">Details für: {{ selected_sorte.name }}</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div><strong>Kategorie:</strong> {{ selected_sorte.kategorie.name|default:"-" }}</div>
+            <div><strong>Art:</strong> {{ selected_sorte.art.name|default:"-" }}</div>
+            <div><strong>Aktueller Bestand:</strong> {{ selected_sorte.bestand }} {{ selected_sorte.get_einheit_display }}</div>
+            <div><strong>Standard Info-URL:</strong> 
+                {% if selected_sorte.info_url %}
+                    <a href="{{ selected_sorte.info_url }}" target="_blank" style="color: var(--primary-color);">Link</a>
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Pflanzplan-Einträge</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Jahr</th>
+                    <th>Aussaatdatum</th>
+                    <th>Anzahl</th>
+                    <th>Art der Aussaat</th>
+                    <th>Info</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for eintrag in eintraege %}
+                <tr>
+                    <td data-label="Jahr">{{ eintrag.jahr }}</td>
+                    <td data-label="Aussaatdatum">{{ eintrag.aussaatdatum|date:"d.m.Y" }}</td>
+                    <td data-label="Anzahl">{{ eintrag.anzahl_samen }}</td>
+                    <td data-label="Art der Aussaat">{{ eintrag.get_art_der_aussaat_display }}</td>
+                    <td data-label="Info">
+                        {% if eintrag.sorte.info_url %}
+                        <a href="{{ eintrag.sorte.info_url }}" target="_blank" style="color: var(--primary-color);">Link</a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">Keine Pflanzplan-Einträge für diese Auswahl gefunden.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% elif sorte_query %}
+    <div class="card" style="background-color: #fef2f2; border: 1px solid #fee2e2; color: #991b1b;">
+        Die Sorte "<strong>{{ sorte_query }}</strong>" wurde nicht gefunden. Bitte wähle eine Sorte aus der Liste aus.
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 3rem; color: #666;">
+        <p>Bitte gib oben den Namen einer Sorte ein, um die Analyse anzuzeigen.</p>
+    </div>
+{% endif %}
+{% endblock %}

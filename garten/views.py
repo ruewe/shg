@@ -215,3 +215,37 @@ def pflanzplan_delete(request, pk):
         eintrag.delete()
         return redirect('pflanzplan_list')
     return render(request, 'garten/confirm_delete.html', {'object': eintrag, 'type': 'Pflanzplan-Eintrag'})
+
+@login_required
+def sorte_analyse(request):
+    sorte_query = request.GET.get('sorte_name', '')
+    jahr_filter = request.GET.get('jahr', '')
+    
+    # All varieties for the datalist / dropdown
+    alle_sorten = Sorte.objects.all().order_by('name')
+    
+    # Available years for filtering
+    jahre = PflanzplanEintrag.objects.values_list('jahr', flat=True).distinct().order_by('-jahr')
+    
+    eintraege = []
+    selected_sorte = None
+    
+    if sorte_query:
+        # Try to find the exact variety by name
+        selected_sorte = Sorte.objects.filter(name=sorte_query).first()
+        
+        if selected_sorte:
+            eintraege = PflanzplanEintrag.objects.filter(sorte=selected_sorte).select_related('sorte', 'sorte__kategorie')
+            if jahr_filter:
+                eintraege = eintraege.filter(jahr=jahr_filter)
+            eintraege = eintraege.order_by('-jahr', '-aussaatdatum')
+
+    context = {
+        'alle_sorten': alle_sorten,
+        'jahre': jahre,
+        'eintraege': eintraege,
+        'selected_sorte': selected_sorte,
+        'sorte_query': sorte_query,
+        'selected_jahr': int(jahr_filter) if jahr_filter else None,
+    }
+    return render(request, 'garten/sorte_analyse.html', context)
