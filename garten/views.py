@@ -218,7 +218,7 @@ def pflanzplan_delete(request, pk):
 
 @login_required
 def sorte_analyse(request):
-    sorte_query = request.GET.get('q_sorte_search', '')
+    sorte_query = request.GET.get('lookup_id', '')
     jahr_filter = request.GET.get('jahr', '')
     
     # All varieties for the datalist / dropdown
