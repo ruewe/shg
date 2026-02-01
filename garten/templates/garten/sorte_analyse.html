@@ -4,16 +4,18 @@
 <h1>Sorten-Analyse</h1>
 
 <div class="card" style="margin-bottom: 2rem;">
-    <form method="get" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+    <form method="get" autocomplete="off" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 250px;">
             <label for="sorte_input" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Sorte suchen:</label>
             <input type="text" 
-                   id="sorte_input" 
-                   name="sorte_name" 
+                   id="q_sorte_search" 
+                   name="q_sorte_search" 
                    list="sorten_list" 
                    value="{{ sorte_query }}" 
                    placeholder="Name eingeben..."
                    autocomplete="off"
+                   autocapitalize="none"
+                   spellcheck="false"
                    style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
             <datalist id="sorten_list">
                 {% for s in alle_sorten %}
