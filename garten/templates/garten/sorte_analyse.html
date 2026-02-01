@@ -136,7 +136,6 @@
                     <th>Aussaatdatum</th>
                     <th>Anzahl</th>
                     <th>Art der Aussaat</th>
-                    <th>Info</th>
                 </tr>
             </thead>
             <tbody>
@@ -146,17 +145,10 @@
                     <td data-label="Aussaatdatum">{{ eintrag.aussaatdatum|date:"d.m.Y" }}</td>
                     <td data-label="Anzahl">{{ eintrag.anzahl_samen }}</td>
                     <td data-label="Art der Aussaat">{{ eintrag.get_art_der_aussaat_display }}</td>
-                    <td data-label="Info">
-                        {% if eintrag.sorte.info_url %}
-                        <a href="{{ eintrag.sorte.info_url }}" target="_blank" style="color: var(--primary-color);">Link</a>
-                        {% else %}
-                        -
-                        {% endif %}
-                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5">Keine Pflanzplan-Einträge für diese Auswahl gefunden.</td>
+                    <td colspan="4">Keine Pflanzplan-Einträge für diese Auswahl gefunden.</td>
                 </tr>
                 {% endfor %}
             </tbody>
