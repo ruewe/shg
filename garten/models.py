@@ -58,7 +58,7 @@ class PflanzplanEintrag(models.Model):
     ]
 
     sorte = models.ForeignKey(Sorte, on_delete=models.PROTECT, related_name='pflanzplaene')
-    jahr = models.PositiveSmallIntegerField(help_text='Kalenderjahr, z. B. 2025')
+    jahr = models.PositiveSmallIntegerField(editable=False)
     aussaatdatum = models.DateField()
     anzahl_samen = models.PositiveIntegerField()
     art_der_aussaat = models.CharField(max_length=20, choices=AUSSAAT_ART)
@@ -71,6 +71,11 @@ class PflanzplanEintrag(models.Model):
         verbose_name = 'Pflanzplan-Eintrag'
         verbose_name_plural = 'Pflanzplan-Einträge'
         ordering = ['-jahr', 'aussaatdatum']
+
+    def save(self, *args, **kwargs):
+        if self.aussaatdatum:
+            self.jahr = self.aussaatdatum.year
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.sorte.name} — {self.jahr} ({self.aussaatdatum})"

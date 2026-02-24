@@ -37,3 +37,4 @@ class PflanzplanEintragAdmin(admin.ModelAdmin):
     list_display = ('sorte', 'jahr', 'aussaatdatum', 'anzahl_samen', 'art_der_aussaat')
     list_filter = ('jahr', 'art_der_aussaat')
     search_fields = ('sorte__name',)
+    readonly_fields = ('jahr',)
