@@ -8,17 +8,28 @@
         {% csrf_token %}
         
         {% for field in form %}
-        <div class="form-group" style="margin-bottom: 1rem;">
-            <label for="{{ field.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">{{ field.label }}</label>
-            {{ field }}
-            {% if field.help_text %}
-            <small style="color: #666;">{{ field.help_text }}</small>
+            {% if field.is_hidden %}
+                {{ field }}
+            {% else %}
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label for="{{ field.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <small style="color: #666;">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                <div style="color: red;">{{ error }}</div>
+                {% endfor %}
+            </div>
             {% endif %}
-            {% for error in field.errors %}
-            <div style="color: red;">{{ error }}</div>
-            {% endfor %}
-        </div>
         {% endfor %}
+
+        <div style="margin-top: 1rem; margin-bottom: 1rem;">
+            <button type="button" id="btn-gps" style="background-color: #f0f0f0; color: #333; padding: 0.5rem 1rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">
+                📍 Aktuelle Position erfassen
+            </button>
+            <span id="gps-status" style="margin-left: 10px; font-size: 0.9em; color: green;"></span>
+        </div>
 
         <div style="margin-top: 1.5rem;">
             <button type="submit" style="background-color: var(--primary-color); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem;">Speichern</button>
@@ -30,68 +41,108 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const select = document.getElementById('id_sorte');
-        if (!select) return;
+        if (select) {
+            // Create search input wrapper for better styling
+            const wrapper = document.createElement('div');
+            wrapper.style.marginBottom = '0.5rem';
+            
+            // Create search input
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'Sorte suchen...';
+            searchInput.className = 'form-control'; 
+            searchInput.style.width = '100%';
+            searchInput.style.boxSizing = 'border-box'; // Ensure padding doesn't break width
 
-        // Create search input wrapper for better styling
-        const wrapper = document.createElement('div');
-        wrapper.style.marginBottom = '0.5rem';
-        
-        // Create search input
-        const searchInput = document.createElement('input');
-        searchInput.type = 'text';
-        searchInput.placeholder = 'Sorte suchen...';
-        searchInput.className = 'form-control'; 
-        searchInput.style.width = '100%';
-        searchInput.style.boxSizing = 'border-box'; // Ensure padding doesn't break width
+            wrapper.appendChild(searchInput);
+            
+            // Insert before select
+            select.parentNode.insertBefore(wrapper, select);
 
-        wrapper.appendChild(searchInput);
-        
-        // Insert before select
-        select.parentNode.insertBefore(wrapper, select);
+            // Store original options
+            // We clone nodes to keep references safe when removing
+            const originalOptions = Array.from(select.options).map(opt => opt.cloneNode(true));
 
-        // Store original options
-        // We clone nodes to keep references safe when removing
-        const originalOptions = Array.from(select.options).map(opt => opt.cloneNode(true));
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const currentValue = select.value; // Try to keep selection if possible
 
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const currentValue = select.value; // Try to keep selection if possible
+                // Clear current options
+                select.innerHTML = '';
 
-            // Clear current options
-            select.innerHTML = '';
+                let foundSelected = false;
 
-            let foundSelected = false;
+                // Filter and re-append
+                originalOptions.forEach(option => {
+                    const text = option.text.toLowerCase();
+                    const matches = text.includes(searchTerm);
+                    // Always keep the placeholder "---------" or empty value if it exists and search is empty
+                    const isPlaceholder = option.value === ''; 
 
-            // Filter and re-append
-            originalOptions.forEach(option => {
-                const text = option.text.toLowerCase();
-                const matches = text.includes(searchTerm);
-                // Always keep the placeholder "---------" or empty value if it exists and search is empty
-                const isPlaceholder = option.value === ''; 
+                    if (matches || (isPlaceholder && searchTerm === '')) {
+                        select.add(option.cloneNode(true)); // Add clone to DOM
+                        if (option.value === currentValue) foundSelected = true;
+                    }
+                });
 
-                if (matches || (isPlaceholder && searchTerm === '')) {
-                    select.add(option.cloneNode(true)); // Add clone to DOM
-                    if (option.value === currentValue) foundSelected = true;
+                // Restore selection if it still exists in the filtered list
+                if (foundSelected) {
+                    select.value = currentValue;
+                } else if (select.options.length > 0) {
+                     // Convert '---------' or empty option to selected if nothing else matches
+                     if (select.options[0].value === '') {
+                         select.selectedIndex = 0;
+                     }
+                }
+                
+                // If no match, we could add a placeholder, but empty list is also clear.
+                if (select.options.length === 0) {
+                     const noResult = new Option('Keine Sorte gefunden', '');
+                     noResult.disabled = true;
+                     select.add(noResult);
                 }
             });
+        }
 
-            // Restore selection if it still exists in the filtered list
-            if (foundSelected) {
-                select.value = currentValue;
-            } else if (select.options.length > 0) {
-                 // Convert '---------' or empty option to selected if nothing else matches
-                 if (select.options[0].value === '') {
-                     select.selectedIndex = 0;
-                 }
-            }
-            
-            // If no match, we could add a placeholder, but empty list is also clear.
-            if (select.options.length === 0) {
-                 const noResult = new Option('Keine Sorte gefunden', '');
-                 noResult.disabled = true;
-                 select.add(noResult);
-            }
-        });
+        // GPS Erfassung
+        const btnGps = document.getElementById('btn-gps');
+        const gpsStatus = document.getElementById('gps-status');
+        const latInput = document.getElementById('id_latitude');
+        const lngInput = document.getElementById('id_longitude');
+        const accInput = document.getElementById('id_gps_genauigkeit');
+
+        if (btnGps && latInput && lngInput) {
+            btnGps.addEventListener('click', function() {
+                if (!navigator.geolocation) {
+                    gpsStatus.textContent = 'Geolocation wird vom Browser nicht unterstützt';
+                    gpsStatus.style.color = 'red';
+                    return;
+                }
+
+                gpsStatus.textContent = 'Position wird ermittelt... (kann ein paar Sekunden dauern)';
+                gpsStatus.style.color = '#666';
+
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        latInput.value = position.coords.latitude.toFixed(6);
+                        lngInput.value = position.coords.longitude.toFixed(6);
+                        if (accInput) accInput.value = position.coords.accuracy.toFixed(1);
+                        
+                        gpsStatus.textContent = `✅ Gespeichert! (Genauigkeit: ${Math.round(position.coords.accuracy)}m)`;
+                        gpsStatus.style.color = 'green';
+                    },
+                    function(error) {
+                        gpsStatus.textContent = `Fehler: ${error.message}`;
+                        gpsStatus.style.color = 'red';
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            });
+        }
     });
 </script>
 {% endblock %}

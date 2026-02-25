@@ -92,6 +92,14 @@ WSGI_APPLICATION = 'shg.wsgi.application'
 
 DATABASES = {
     'default': {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+
+# Wenn eine Postgres-Verbindung via .env definiert ist, nutze diese anstatt SQLite
+if os.getenv("DB_HOST"):
+    DATABASES['default'] = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER"),
@@ -99,7 +107,6 @@ DATABASES = {
         "HOST": os.getenv("DB_HOST"),
         "PORT": os.getenv("DB_PORT"),
     }
-}
 
 
 # Password validation

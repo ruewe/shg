@@ -35,11 +35,14 @@ class SorteForm(forms.ModelForm):
 class PflanzplanForm(forms.ModelForm):
     class Meta:
         model = PflanzplanEintrag
-        fields = ['sorte', 'aussaatdatum', 'anzahl_samen', 'art_der_aussaat', 'anzuchtgefaess']
+        fields = ['sorte', 'aussaatdatum', 'anzahl_samen', 'art_der_aussaat', 'anzuchtgefaess', 'latitude', 'longitude', 'gps_genauigkeit']
         widgets = {
             'sorte': forms.Select(attrs={'class': 'form-control'}),
             'aussaatdatum': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'anzahl_samen': forms.NumberInput(attrs={'class': 'form-control'}),
             'art_der_aussaat': forms.Select(attrs={'class': 'form-control'}),
             'anzuchtgefaess': forms.TextInput(attrs={'class': 'form-control'}),
+            'latitude': forms.HiddenInput(),
+            'longitude': forms.HiddenInput(),
+            'gps_genauigkeit': forms.HiddenInput(),
         }

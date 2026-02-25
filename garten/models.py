@@ -66,6 +66,11 @@ class PflanzplanEintrag(models.Model):
     pikierdatum = models.DateField(null=True, blank=True)
     pflanzdatum = models.DateField(null=True, blank=True)
     beschreibung = models.TextField(blank=True)
+    
+    # GPS Tracking
+    latitude = models.DecimalField('Breitengrad', max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField('Längengrad', max_digits=9, decimal_places=6, null=True, blank=True)
+    gps_genauigkeit = models.DecimalField('Genauigkeit (m)', max_digits=5, decimal_places=1, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Pflanzplan-Eintrag'
