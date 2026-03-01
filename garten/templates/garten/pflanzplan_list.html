@@ -68,6 +68,7 @@
                     {% endif %}
                 </td>
                 <td data-label="Aktionen">
+                    <a href="{% url 'pflanzplan_update' eintrag.pk %}" style="color: var(--primary-color); margin-right: 0.5rem;">Bearbeiten</a>
                     <a href="{% url 'pflanzplan_delete' eintrag.pk %}" style="color: #dc3545;">Löschen</a>
                 </td>
             </tr>

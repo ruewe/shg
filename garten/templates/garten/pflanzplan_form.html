@@ -1,7 +1,7 @@
 {% extends 'garten/base.html' %}
 
 {% block content %}
-<h1>Neuen Pflanzplan-Eintrag anlegen</h1>
+<h1>{% if form.instance.pk %}Eintrag bearbeiten{% else %}Neuen Pflanzplan-Eintrag anlegen{% endif %}</h1>
 
 <div class="card">
     <form method="post">

@@ -101,6 +101,18 @@ def pflanzplan_create(request):
     return render(request, 'garten/pflanzplan_form.html', {'form': form})
 
 @login_required
+def pflanzplan_update(request, pk):
+    eintrag = get_object_or_404(PflanzplanEintrag, pk=pk)
+    if request.method == 'POST':
+        form = PflanzplanForm(request.POST, instance=eintrag)
+        if form.is_valid():
+            form.save()
+            return redirect('pflanzplan_list')
+    else:
+        form = PflanzplanForm(instance=eintrag)
+    return render(request, 'garten/pflanzplan_form.html', {'form': form})
+
+@login_required
 def kategorie_create(request):
     if request.method == 'POST':
         form = KategorieForm(request.POST)
