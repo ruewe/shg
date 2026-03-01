@@ -38,7 +38,7 @@ class PflanzplanForm(forms.ModelForm):
         fields = ['sorte', 'aussaatdatum', 'anzahl_samen', 'art_der_aussaat', 'anzuchtgefaess', 'latitude', 'longitude', 'gps_genauigkeit']
         widgets = {
             'sorte': forms.Select(attrs={'class': 'form-control'}),
-            'aussaatdatum': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'aussaatdatum': forms.DateInput(format='%Y-%m-%d', attrs={'class': 'form-control', 'type': 'date'}),
             'anzahl_samen': forms.NumberInput(attrs={'class': 'form-control'}),
             'art_der_aussaat': forms.Select(attrs={'class': 'form-control'}),
             'anzuchtgefaess': forms.TextInput(attrs={'class': 'form-control'}),
