@@ -24,12 +24,30 @@
             {% endfor %}
         </select>
 
-        <select name="sorte" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
-            <option value="">Alle Sorten</option>
-            {% for s in sorten %}
-            <option value="{{ s.id }}" {% if selected_sorte == s.id %}selected{% endif %}>{{ s.name }}</option>
-            {% endfor %}
-        </select>
+        <div style="position: relative; min-width: 250px;">
+            <input style="display:none" type="text" name="fake_name_remembered">
+            <input type="text" 
+                   id="dummy_search_field" 
+                   value="{% for s in sorten %}{% if selected_sorte == s.id %}{{ s.name }}{% endif %}{% endfor %}" 
+                   placeholder="Sorte suchen..."
+                   autocomplete="off"
+                   autocorrect="off"
+                   autocapitalize="none"
+                   spellcheck="false"
+                   style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc; width: 100%; box-sizing: border-box;">
+            <input type="hidden" id="real_lookup_id" name="sorte" value="{{ selected_sorte|default_if_none:'' }}">
+            
+            <div id="custom_suggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; border-top: none; border-radius: 0 0 4px 4px; z-index: 1000; max-height: 200px; overflow-y: auto; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div class="suggestion-item" data-value="" data-text="Alle Sorten" style="padding: 0.5rem; cursor: pointer; border-bottom: 1px solid #eee;">
+                    Alle Sorten
+                </div>
+                {% for s in sorten %}
+                <div class="suggestion-item" data-value="{{ s.id }}" data-text="{{ s.name }}" style="padding: 0.5rem; cursor: pointer; border-bottom: 1px solid #eee;">
+                    {{ s.name }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
 
         <button type="submit"
             style="background-color: var(--secondary-color); color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer;">Filtern</button>
@@ -80,4 +98,92 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dummyInput = document.getElementById('dummy_search_field');
+        const realInput = document.getElementById('real_lookup_id');
+        const suggestionsBox = document.getElementById('custom_suggestions');
+        
+        if(dummyInput) {
+            const items = suggestionsBox.querySelectorAll('.suggestion-item');
+            
+            dummyInput.addEventListener('input', function() {
+                const val = this.value.toLowerCase();
+                
+                // If user clears the input, reset real value to empty
+                if(val === '') {
+                    realInput.value = '';
+                }
+
+                let hasMatches = false;
+
+                items.forEach(item => {
+                    const text = item.getAttribute('data-text').toLowerCase();
+                    if (val.length === 0 || text.includes(val)) {
+                        item.style.display = 'block';
+                        hasMatches = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                
+                if (val.length > 0) {
+                    suggestionsBox.style.display = hasMatches ? 'block' : 'none';
+                } else {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+
+            // Re-show suggestions when input is clicked
+            dummyInput.addEventListener('click', function() {
+                const val = this.value.toLowerCase();
+                items.forEach(item => {
+                    const text = item.getAttribute('data-text').toLowerCase();
+                    if (val.length === 0 || text.includes(val)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                suggestionsBox.style.display = 'block';
+            });
+
+            items.forEach(item => {
+                item.addEventListener('click', function() {
+                    const chosenId = this.getAttribute('data-value');
+                    const chosenText = this.getAttribute('data-text');
+                    
+                    if(chosenId === "") {
+                        dummyInput.value = "";
+                    } else {
+                        dummyInput.value = chosenText;
+                    }
+                    realInput.value = chosenId;
+                    suggestionsBox.style.display = 'none';
+                    
+                    // Immediately submit when an option is clicked
+                    dummyInput.form.submit();
+                });
+            });
+
+            // Hide when interacting outside
+            document.addEventListener('click', function(e) {
+                if (!dummyInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+
+            // Hover styling
+            items.forEach(item => {
+                item.addEventListener('mouseover', function() {
+                    this.style.backgroundColor = '#f0f0f0';
+                });
+                item.addEventListener('mouseout', function() {
+                    this.style.backgroundColor = 'white';
+                });
+            });
+        }
+    });
+</script>
 {% endblock %}
