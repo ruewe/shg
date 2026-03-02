@@ -136,6 +136,7 @@
                     <th>Aussaatdatum</th>
                     <th>Anzahl</th>
                     <th>Art der Aussaat</th>
+                    <th>Position</th>
                 </tr>
             </thead>
             <tbody>
@@ -145,10 +146,19 @@
                     <td data-label="Aussaatdatum">{{ eintrag.aussaatdatum|date:"d.m.Y" }}</td>
                     <td data-label="Anzahl">{{ eintrag.anzahl_samen }}</td>
                     <td data-label="Art der Aussaat">{{ eintrag.get_art_der_aussaat_display }}</td>
+                    <td data-label="Position">
+                        {% if eintrag.latitude and eintrag.longitude %}
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ eintrag.latitude|stringformat:'s' }},{{ eintrag.longitude|stringformat:'s' }}" target="_blank" style="color: var(--primary-color); text-decoration: none;" title="Auf Karte anzeigen">
+                            📍 Karte
+                        </a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4">Keine Pflanzplan-Einträge für diese Auswahl gefunden.</td>
+                    <td colspan="5">Keine Pflanzplan-Einträge für diese Auswahl gefunden.</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -65,6 +65,7 @@
                 <th>Aussaat</th>
                 <th>Art</th>
                 <th>Anzahl</th>
+                <th>Position</th>
                 <th>Info</th>
                 <th>Aktionen</th>
             </tr>
@@ -78,6 +79,15 @@
                 <td data-label="Aussaat">{{ eintrag.aussaatdatum|date:"d.m.Y" }}</td>
                 <td data-label="Art">{{ eintrag.get_art_der_aussaat_display }}</td>
                 <td data-label="Anzahl">{{ eintrag.anzahl_samen }}</td>
+                <td data-label="Position">
+                    {% if eintrag.latitude and eintrag.longitude %}
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ eintrag.latitude|stringformat:'s' }},{{ eintrag.longitude|stringformat:'s' }}" target="_blank" style="color: var(--primary-color); text-decoration: none;" title="Auf Karte anzeigen">
+                        📍 Karte
+                    </a>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
                 <td data-label="Info">
                     {% if eintrag.sorte.info_url %}
                     <a href="{{ eintrag.sorte.info_url }}" target="_blank" style="color: var(--primary-color);">Link</a>
@@ -92,7 +102,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="8">Keine Einträge gefunden.</td>
+                <td colspan="9">Keine Einträge gefunden.</td>
             </tr>
             {% endfor %}
         </tbody>
