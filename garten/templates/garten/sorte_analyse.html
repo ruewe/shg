@@ -148,7 +148,7 @@
                     <td data-label="Art der Aussaat">{{ eintrag.get_art_der_aussaat_display }}</td>
                     <td data-label="Position">
                         {% if eintrag.latitude and eintrag.longitude %}
-                        <a href="https://www.google.com/maps/search/?api=1&query={{ eintrag.latitude|stringformat:'s' }},{{ eintrag.longitude|stringformat:'s' }}" target="_blank" style="color: var(--primary-color); text-decoration: none;" title="Auf Karte anzeigen">
+                        <a href="https://www.openstreetmap.org/?mlat={{ eintrag.latitude|stringformat:'s' }}&mlon={{ eintrag.longitude|stringformat:'s' }}#map=18/{{ eintrag.latitude|stringformat:'s' }}/{{ eintrag.longitude|stringformat:'s' }}" target="_blank" style="color: var(--primary-color); text-decoration: none;" title="Auf Karte anzeigen">
                             📍 Karte
                         </a>
                         {% else %}
